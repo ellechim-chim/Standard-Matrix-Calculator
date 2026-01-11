@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Standard Matrix Calculator</title>
+  <link rel="stylesheet" href="design.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.3.2/math.js"></script>
+</head>
+
+<body>
+  <div class="container">
+   <div class="title">Standard Matrix Calculator</div>
+
+   <div class="step" id="step1">
+     <div class="subtitle">Step 1: Enter Dimensions</div>
+     <p>Maximum of 5 dimensions only (n, m ≤ 5).</p>
+     <div class="row">
+       <span class="label">Domain dimension (n):</span>
+       <input type="number" name="n" id="domain" placeholder="1 - 5" min="1" max="5">
+     </div>
+     <div class="row">
+       <span class="label">Codomain dimension (m):</span>
+       <input type="number" name="m" id="codomain" min="1" max="5" placeholder="1 - 5">
+     </div>
+     <button onclick="setDimensions()">Set Dimensions</button>
+   </div>
+
+   <div class="step" id="step2" style="display:none;">
+     <div class="subtitle">Step 2a: Enter basis vectors (b₁,b₂,...,bₙ)</div>
+     <div id="basisInputs"></div>
+
+     <div class="subtitle">Step 2b: Enter images (T(b₁),..., T(bₙ))</div>
+     <div id="imageInputs"></div>
+
+     <button onclick="generateMatrix()">Generate Standard Matrix</button>
+   </div>
+
+   <div class="step" id="result" style="display:none;">
+     <div class="subtitle">Standard Matrix Result</div>
+     <div id="matrixOutput"></div>
+   </div>
+ </div>
+
+<script>
+let n, m;
+
+function setDimensions() {
+  n = parseInt(document.getElementById('domain').value);
+  m = parseInt(document.getElementById('codomain').value);
+
+  if (n >= 1 && n <= 5 && m >= 1 && m <= 5) {
+    document.getElementById('step2').style.display = 'block';
+    buildInputs();
+  } else {
+    alert('Please enter valid dimensions (1–5).');
+  }
+}
+
+function buildInputs() {
+  const basisDiv = document.getElementById('basisInputs');
+  const imageDiv = document.getElementById('imageInputs');
+  basisDiv.innerHTML = '';
+  imageDiv.innerHTML = '';
+
+  let basisTable = '<table><tr>';
+  for (let j = 0; j < n; j++) {
+    basisTable += `<th>b${j + 1}</th>`;
+  }
+  basisTable += '</tr>';
+  for (let i = 0; i < n; i++) {
+    basisTable += '<tr>';
+    for (let j = 0; j < n; j++) {
+      basisTable += `<td><input type="number" id="b${i}_${j}" class="small-input"></td>`;
+    }
+    basisTable += '</tr>';
+  }
+  basisTable += '</table>';
+  basisDiv.innerHTML = basisTable;
+
+  let imageTable = '<table><tr>';
+  for (let j = 0; j < n; j++) {
+    imageTable += `<th>T(b${j + 1})</th>`;
+  }
+  imageTable += '</tr>';
+  for (let i = 0; i < m; i++) {
+    imageTable += '<tr>';
+    for (let j = 0; j < n; j++) {
+      imageTable += `<td><input type="number" id="t${i}_${j}" class="small-input"></td>`;
+    }
+    imageTable += '</tr>';
+  }
+  imageTable += '</table>';
+  imageDiv.innerHTML = imageTable;
+}
+
+function generateMatrix() {
+
+  let basisMatrix = [];
+  for (let i = 0; i < n; i++) {
+    basisMatrix[i] = [];
+    for (let j = 0; j < n; j++) {
+      let val = document.getElementById(`b${i}_${j}`).value;
+      basisMatrix[i][j] = val ? parseFloat(val) : 0;
+    }
+  }
+
+  let temp = math.matrix(basisMatrix);
+  if (math.det(temp) === 0) {
+    alert('Invalid basis vector values! Please enter linearly independent basis vectors.');
+    return;
+  }
+
+  let tempImageMatrix = [];
+  for (let i = 0; i < m; i++) {
+    tempImageMatrix[i] = [];
+    for (let j = 0; j < n; j++) {
+      let val = document.getElementById(`t${i}_${j}`).value;
+      tempImageMatrix[i][j] = val ? parseFloat(val) : 0;
+    }
+  }
+
+  let inverseBasisMatrix = math.inv(temp);
+  let imageMatrix = math.matrix(tempImageMatrix);
+  let standardMatrix = math.multiply(imageMatrix, inverseBasisMatrix);
+
+  let html = '<table>';
+  for (let i = 0; i < m; i++) {
+    html += '<tr>';
+    for (let j = 0; j < n; j++) {
+      html += `<td>${Math.round(standardMatrix.get([i, j]) * 100) / 100}</td>`;
+    }
+    html += '</tr>';
+  }
+  html += '</table>';
+
+  document.getElementById('matrixOutput').innerHTML = html;
+  document.getElementById('result').style.display = 'block';
+}
+</script>
+
+</body>
+</html>
