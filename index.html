@@ -13,7 +13,7 @@
 
    <div class="step" id="step1">
      <div class="subtitle">Step 1: Enter Dimensions</div>
-     <p>Maximum of 5 dimensions only (n, m ≤ 5).</p>
+     <p>Maximum of 5 dimensions only (n, m â‰¤ 5).</p>
      <div class="row">
        <span class="label">Domain dimension (n):</span>
        <input type="number" name="n" id="domain" placeholder="1 - 5" min="1" max="5">
@@ -23,21 +23,25 @@
        <input type="number" name="m" id="codomain" min="1" max="5" placeholder="1 - 5">
      </div>
      <button onclick="setDimensions()">Set Dimensions</button>
+     <button onclick="ResetMatrix()">Reset Dimensions</button>
+     
    </div>
 
    <div class="step" id="step2" style="display:none;">
-     <div class="subtitle">Step 2a: Enter basis vectors (b₁,b₂,...,bₙ)</div>
+     <div class="subtitle">Step 2a: Enter basis vectors (bâ‚,bâ‚‚,...,bâ‚™)</div>
      <div id="basisInputs"></div>
 
-     <div class="subtitle">Step 2b: Enter images (T(b₁),..., T(bₙ))</div>
+     <div class="subtitle">Step 2b: Enter images (T(bâ‚),..., T(bâ‚™))</div>
      <div id="imageInputs"></div>
 
      <button onclick="generateMatrix()">Generate Standard Matrix</button>
+     <button onclick="ResetInputBasis()">Reset Input</button>
    </div>
 
    <div class="step" id="result" style="display:none;">
      <div class="subtitle">Standard Matrix Result</div>
      <div id="matrixOutput"></div>
+     <button onclick="ResetMatrix()">Create New Calculator</button>
    </div>
  </div>
 
@@ -52,7 +56,7 @@ function setDimensions() {
     document.getElementById('step2').style.display = 'block';
     buildInputs();
   } else {
-    alert('Please enter valid dimensions (1–5).');
+    alert('Please enter valid dimensions (1â€“5).');
   }
 }
 
@@ -91,6 +95,26 @@ function buildInputs() {
   }
   imageTable += '</table>';
   imageDiv.innerHTML = imageTable;
+}
+
+function ResetMatrix() {
+  document.getElementById("domain").value = "";
+  document.getElementById("codomain").value = "";
+  document.getElementById('step2').style.display = 'none';
+  document.getElementById('result').style.display = 'none';
+}
+
+function ResetInputBasis() {
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      document.getElementById(`b${i}_${j}`).value = "";
+    }
+    for (let i = 0; i < m; i++) {
+      for (let j = 0; j < n; j++) {
+        document.getElementById(`t${i}_${j}`).value = "";
+      }
+    }
+  }
 }
 
 function generateMatrix() {
